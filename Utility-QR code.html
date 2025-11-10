@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .generator-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .generator-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .input-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-purple);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon input, .input-with-icon textarea {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-with-icon input:focus, .input-with-icon textarea:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--light-text);
+        }
+
+        .input-with-icon textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .options-section {
+            margin-bottom: 30px;
+        }
+
+        .options-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light-purple);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .option-group {
+            margin-bottom: 15px;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .option-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .option-select:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-purple);
+            margin-top: 5px;
+        }
+
+        .color-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .color-option label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .color-input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        .result-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .qr-preview {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .qr-code-container {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        #qrCode {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .qr-placeholder {
+            text-align: center;
+            color: var(--light-text);
+        }
+
+        .qr-placeholder i {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .btn-download {
+            background-color: var(--primary-purple);
+            color: var(--white);
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-download:hover {
+            background-color: var(--secondary-purple);
+        }
+
+        .download-options {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .info-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .info-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .info-section p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .result-section {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .generator-card {
+                padding: 20px;
+            }
+
+            .color-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">QR Code Generator</h1>
+            <p class="tool-subtitle">Create custom QR codes for URLs, text, contact information, and more</p>
+        </div>
+    </section>
+
+    <!-- Generator Tool -->
+    <section class="generator-container">
+        <div class="container">
+            <div class="generator-card">
+                <div class="input-section">
+                    <h3>QR Code Content</h3>
+                    <div class="input-group">
+                        <label for="qrContent">Enter text or URL</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-link input-icon"></i>
+                            <textarea id="qrContent" placeholder="Enter URL, text, or any content you want to encode...">https://multitooler.com</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="options-section">
+                    <h3>Customization Options</h3>
+                    <div class="options-grid">
+                        <div class="option-group">
+                            <label for="qrSize">QR Code Size</label>
+                            <select id="qrSize" class="option-select">
+                                <option value="128">Small (128x128)</option>
+                                <option value="256" selected>Medium (256x256)</option>
+                                <option value="512">Large (512x512)</option>
+                                <option value="1024">Extra Large (1024x1024)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="errorCorrection">Error Correction</label>
+                            <select id="errorCorrection" class="option-select">
+                                <option value="L">Low (7%)</option>
+                                <option value="M" selected>Medium (15%)</option>
+                                <option value="Q">Quartile (25%)</option>
+                                <option value="H">High (30%)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="option-group">
+                            <label for="qrMargin">Margin</label>
+                            <div class="slider-container">
+                                <input type="range" id="qrMargin" class="slider" min="0" max="20" value="4">
+                                <div class="slider-value" id="qrMarginValue">4</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="color-options">
+                        <div class="color-option">
+                            <label for="qrColor">QR Code Color</label>
+                            <input type="color" id="qrColor" class="color-input" value="#6A0DAD">
+                        </div>
+                        <div class="color-option">
+                            <label for="bgColor">Background Color</label>
+                            <input type="color" id="bgColor" class="color-input" value="#FFFFFF">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-section">
+                    <div class="qr-preview">
+                        <div class="qr-code-container">
+                            <div id="qrCode" class="qr-placeholder">
+                                <i class="fas fa-qrcode"></i>
+                                <p>Your QR code will appear here</p>
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" id="generateBtn">Generate QR Code</button>
+                            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                        </div>
+                        
+                        <div class="download-options">
+                            <button class="btn btn-download" id="downloadPNG" disabled>
+                                <i class="fas fa-download"></i> Download PNG
+                            </button>
+                            <button class="btn btn-download" id="downloadSVG" disabled>
+                                <i class="fas fa-download"></i> Download SVG
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About QR Codes</h3>
+                    <p>QR codes (Quick Response codes) are two-dimensional barcodes that can store various types of information, including URLs, text, contact details, and more.</p>
+                    <p>Our QR code generator allows you to create custom QR codes with different sizes, colors, and error correction levels. Higher error correction means the QR code can still be scanned even if it's partially damaged.</p>
+                    <p>Use QR codes for marketing materials, business cards, product packaging, event tickets, and anywhere you need to share information quickly and efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const qrContent = document.getElementById('qrContent');
+            const qrSize = document.getElementById('qrSize');
+            const errorCorrection = document.getElementById('errorCorrection');
+            const qrMargin = document.getElementById('qrMargin');
+            const qrMarginValue = document.getElementById('qrMarginValue');
+            const qrColor = document.getElementById('qrColor');
+            const bgColor = document.getElementById('bgColor');
+            const generateBtn = document.getElementById('generateBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const downloadPNG = document.getElementById('downloadPNG');
+            const downloadSVG = document.getElementById('downloadSVG');
+            const qrCodeContainer = document.getElementById('qrCode');
+
+            // Variables
+            let currentQRCode = null;
+
+            // Event Listeners
+            generateBtn.addEventListener('click', generateQRCode);
+            resetBtn.addEventListener('click', resetTool);
+            downloadPNG.addEventListener('click', downloadQRCodePNG);
+            downloadSVG.addEventListener('click', downloadQRCodeSVG);
+            
+            qrMargin.addEventListener('input', function() {
+                qrMarginValue.textContent = this.value;
+            });
+
+            // Functions
+            function generateQRCode() {
+                const content = qrContent.value.trim();
+                if (!content) {
+                    alert('Please enter some content for the QR code.');
+                    return;
+                }
+
+                // Clear previous QR code
+                if (currentQRCode) {
+                    qrCodeContainer.innerHTML = '';
+                }
+
+                // Generate new QR code
+                try {
+                    const options = {
+                        width: parseInt(qrSize.value),
+                        height: parseInt(qrSize.value),
+                        margin: parseInt(qrMargin.value),
+                        colorDark: qrColor.value,
+                        colorLight: bgColor.value,
+                        correctLevel: QRCode.CorrectLevel[errorCorrection.value]
+                    };
+
+                    // Create QR code
+                    currentQRCode = new QRCode(qrCodeContainer, {
+                        text: content,
+                        width: options.width,
+                        height: options.height,
+                        colorDark: options.colorDark,
+                        colorLight: options.colorLight,
+                        correctLevel: options.correctLevel
+                    });
+
+                    // Enable download buttons
+                    downloadPNG.disabled = false;
+                    downloadSVG.disabled = false;
+                } catch (error) {
+                    console.error('Error generating QR code:', error);
+                    alert('Error generating QR code. Please try again with different settings.');
+                }
+            }
+
+            function downloadQRCodePNG() {
+                if (!currentQRCode) {
+                    alert('Please generate a QR code first.');
+                    return;
+                }
+
+                try {
+                    const canvas = qrCodeContainer.querySelector('canvas');
+                    if (!canvas) {
+                        alert('QR code canvas not found.');
+                        return;
+                    }
+
+                    const link = document.createElement('a');
+                    link.download = `qr-code-${Date.now()}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                } catch (error) {
+                    console.error('Error downloading PNG:', error);
+                    alert('Error downloading QR code as PNG.');
+                }
+            }
+
+            function downloadQRCodeSVG() {
+                if (!currentQRCode) {
+                    alert('Please generate a QR code first.');
+                    return;
+                }
+
+                try {
+                    // For SVG download, we would need a more complex implementation
+                    // For this demo, we'll show a message that SVG download is not implemented
+                    alert('SVG download functionality would require additional implementation. For now, please use PNG download.');
+                } catch (error) {
+                    console.error('Error downloading SVG:', error);
+                    alert('Error downloading QR code as SVG.');
+                }
+            }
+
+            function resetTool() {
+                qrContent.value = 'https://multitooler.com';
+                qrSize.value = '256';
+                errorCorrection.value = 'M';
+                qrMargin.value = '4';
+                qrMarginValue.textContent = '4';
+                qrColor.value = '#6A0DAD';
+                bgColor.value = '#FFFFFF';
+                
+                // Clear QR code
+                if (currentQRCode) {
+                    qrCodeContainer.innerHTML = '';
+                    currentQRCode = null;
+                }
+                
+                // Reset to placeholder
+                qrCodeContainer.innerHTML = `
+                    <div class="qr-placeholder">
+                        <i class="fas fa-qrcode"></i>
+                        <p>Your QR code will appear here</p>
+                    </div>
+                `;
+                
+                // Disable download buttons
+                downloadPNG.disabled = true;
+                downloadSVG.disabled = true;
+            }
+
+            // Initialize with a sample QR code
+            generateQRCode();
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
