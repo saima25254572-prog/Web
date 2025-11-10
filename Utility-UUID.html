@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UUID Generator | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .uuid-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .uuid-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .uuid-display {
+            margin-bottom: 30px;
+        }
+
+        .uuid-display label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .uuid-output {
+            width: 100%;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+            font-family: 'Courier New', monospace;
+            background-color: #f9f9f9;
+            word-break: break-all;
+            transition: var(--transition);
+            text-align: center;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .uuid-output.copied {
+            background-color: rgba(255, 51, 102, 0.1);
+            border-color: var(--accent-red);
+        }
+
+        .uuid-options {
+            margin-bottom: 30px;
+        }
+
+        .uuid-options h3 {
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+
+        .option-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
+            background-color: var(--light-purple);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .option-btn:hover {
+            background-color: #d8d8f0;
+            transform: translateY(-2px);
+        }
+
+        .option-btn.active {
+            background-color: var(--primary-purple);
+            color: var(--white);
+        }
+
+        .option-btn i {
+            font-size: 1.5rem;
+        }
+
+        .uuid-count {
+            margin-top: 20px;
+        }
+
+        .count-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .count-input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .uuid-history {
+            margin-top: 30px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-header h3 {
+            color: var(--primary-purple);
+        }
+
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .copy-history-btn {
+            background: none;
+            border: none;
+            color: var(--primary-purple);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .copy-history-btn:hover {
+            color: var(--accent-red);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .uuid-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .uuid-info h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .uuid-info ul {
+            padding-left: 20px;
+        }
+
+        .uuid-info li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .option-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .uuid-card {
+                padding: 20px;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .uuid-output {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">UUID Generator</h1>
+            <p class="tool-subtitle">Generate unique identifiers for your applications and databases</p>
+        </div>
+    </section>
+
+    <!-- UUID Generator Tool -->
+    <section class="uuid-container">
+        <div class="container">
+            <div class="uuid-card">
+                <div class="uuid-display">
+                    <label for="uuidOutput">Generated UUID</label>
+                    <div id="uuidOutput" class="uuid-output">
+                        Click "Generate UUID" to create a new identifier
+                    </div>
+                </div>
+
+                <div class="uuid-options">
+                    <h3>UUID Version</h3>
+                    <div class="option-buttons">
+                        <button class="option-btn active" data-version="v4">
+                            <i class="fas fa-random"></i>
+                            Version 4
+                        </button>
+                        <button class="option-btn" data-version="v1">
+                            <i class="fas fa-clock"></i>
+                            Version 1
+                        </button>
+                    </div>
+
+                    <div class="uuid-count">
+                        <label for="countInput">Number of UUIDs to generate</label>
+                        <input type="number" id="countInput" class="count-input" min="1" max="100" value="1">
+                    </div>
+                </div>
+
+                <div class="uuid-history">
+                    <div class="history-header">
+                        <h3>Recent UUIDs</h3>
+                        <button class="btn-secondary" id="clearHistoryBtn">Clear History</button>
+                    </div>
+                    <div class="history-list" id="historyList">
+                        <div class="history-empty">No UUIDs generated yet</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="generateBtn">Generate UUID</button>
+                    <button class="btn btn-secondary" id="copyBtn">Copy to Clipboard</button>
+                    <button class="btn btn-secondary" id="clearBtn">Clear All</button>
+                </div>
+
+                <div class="uuid-info">
+                    <h3>About UUIDs</h3>
+                    <ul>
+                        <li><strong>UUID</strong> stands for Universally Unique Identifier</li>
+                        <li><strong>Version 4</strong> UUIDs are randomly generated and most commonly used</li>
+                        <li><strong>Version 1</strong> UUIDs are based on timestamp and MAC address</li>
+                        <li>UUIDs are 128-bit numbers, usually represented as 32 hexadecimal digits</li>
+                        <li>They are used to uniquely identify information in computer systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const uuidOutput = document.getElementById('uuidOutput');
+            const countInput = document.getElementById('countInput');
+            const historyList = document.getElementById('historyList');
+            const optionButtons = document.querySelectorAll('.option-btn');
+            const generateBtn = document.getElementById('generateBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+            // Variables
+            let currentVersion = 'v4';
+            let uuidHistory = JSON.parse(localStorage.getItem('uuidHistory')) || [];
+
+            // Event Listeners
+            optionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    optionButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentVersion = this.getAttribute('data-version');
+                });
+            });
+
+            generateBtn.addEventListener('click', generateUUID);
+            copyBtn.addEventListener('click', copyUUID);
+            clearBtn.addEventListener('click', clearAll);
+            clearHistoryBtn.addEventListener('click', clearHistory);
+
+            // Functions
+            function generateUUID() {
+                const count = parseInt(countInput.value) || 1;
+                let uuids = [];
+                
+                for (let i = 0; i < count; i++) {
+                    if (currentVersion === 'v4') {
+                        uuids.push(generateV4UUID());
+                    } else {
+                        uuids.push(generateV1UUID());
+                    }
+                }
+                
+                // Display the first UUID
+                uuidOutput.textContent = uuids[0];
+                
+                // Add to history
+                uuids.forEach(uuid => {
+                    uuidHistory.unshift(uuid);
+                });
+                
+                // Keep only last 10 items
+                if (uuidHistory.length > 10) {
+                    uuidHistory = uuidHistory.slice(0, 10);
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('uuidHistory', JSON.stringify(uuidHistory));
+                
+                // Update history display
+                updateHistoryDisplay();
+            }
+
+            function generateV4UUID() {
+                // Generate a version 4 UUID (random)
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                });
+            }
+
+            function generateV1UUID() {
+                // Generate a version 1 UUID (timestamp-based)
+                // This is a simplified version - in reality, v1 UUIDs are more complex
+                const now = new Date().getTime();
+                const timestamp = (now + 12219292800000) * 10000; // Convert to 100-nanosecond intervals since October 15, 1582
+                
+                // Format: time_low - time_mid - time_high_and_version - clock_seq_and_reserved - clock_seq_low - node
+                const timeLow = (timestamp & 0xFFFFFFFF).toString(16).padStart(8, '0');
+                const timeMid = ((timestamp >> 32) & 0xFFFF).toString(16).padStart(4, '0');
+                const timeHigh = ((timestamp >> 48) & 0x0FFF).toString(16).padStart(3, '0') + '1'; // Version 1
+                
+                // Generate random values for the rest
+                const clockSeq = Math.floor(Math.random() * 0x3FFF).toString(16).padStart(4, '0');
+                const node = Array.from({length: 6}, () => 
+                    Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+                ).join('');
+                
+                return `${timeLow}-${timeMid}-${timeHigh}-${clockSeq.substring(0, 2)}${clockSeq.substring(2)}-${node}`;
+            }
+
+            function copyUUID() {
+                if (!uuidOutput.textContent || uuidOutput.textContent.includes('Click')) {
+                    alert('No UUID to copy. Please generate a UUID first.');
+                    return;
+                }
+
+                const textToCopy = uuidOutput.textContent;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Visual feedback
+                    uuidOutput.classList.add('copied');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    
+                    setTimeout(() => {
+                        uuidOutput.classList.remove('copied');
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Clipboard API error:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = textToCopy;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    // Visual feedback
+                    uuidOutput.classList.add('copied');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    
+                    setTimeout(() => {
+                        uuidOutput.classList.remove('copied');
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+
+            function clearAll() {
+                uuidOutput.textContent = 'Click "Generate UUID" to create a new identifier';
+                countInput.value = '1';
+                
+                // Reset to v4
+                optionButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-version="v4"]').classList.add('active');
+                currentVersion = 'v4';
+            }
+
+            function clearHistory() {
+                uuidHistory = [];
+                localStorage.setItem('uuidHistory', JSON.stringify(uuidHistory));
+                updateHistoryDisplay();
+            }
+
+            function updateHistoryDisplay() {
+                if (uuidHistory.length === 0) {
+                    historyList.innerHTML = '<div class="history-empty">No UUIDs generated yet</div>';
+                    return;
+                }
+                
+                historyList.innerHTML = '';
+                uuidHistory.forEach((uuid, index) => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    const uuidSpan = document.createElement('span');
+                    uuidSpan.textContent = uuid;
+                    
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-history-btn';
+                    copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+                    copyButton.title = 'Copy this UUID';
+                    
+                    copyButton.addEventListener('click', function() {
+                        navigator.clipboard.writeText(uuid).then(() => {
+                            // Visual feedback
+                            const originalHTML = copyButton.innerHTML;
+                            copyButton.innerHTML = '<i class="fas fa-check"></i>';
+                            
+                            setTimeout(() => {
+                                copyButton.innerHTML = originalHTML;
+                            }, 1000);
+                        });
+                    });
+                    
+                    historyItem.appendChild(uuidSpan);
+                    historyItem.appendChild(copyButton);
+                    historyList.appendChild(historyItem);
+                });
+            }
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+
+            // Initialize history display
+            updateHistoryDisplay();
+        });
+    </script>
+</body>
+</html>
