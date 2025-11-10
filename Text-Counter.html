@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Counter | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .counter-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .counter-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-section {
+            margin-bottom: 30px;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid var(--light-purple);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: var(--transition);
+            margin-bottom: 15px;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .input-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .paste-btn {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .paste-btn:hover {
+            background-color: #d8d8f0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .stats-section {
+            margin-top: 30px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+            padding: 25px 20px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--light-text);
+        }
+
+        .details-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .detail-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 5px;
+        }
+
+        .detail-label {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .reading-stats {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .reading-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .reading-item {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .reading-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 5px;
+        }
+
+        .reading-label {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .details-grid, .reading-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .counter-card {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">Word Counter</h1>
+            <p class="tool-subtitle">Count words, characters, sentences, and paragraphs in your text with our real-time word counter</p>
+        </div>
+    </section>
+
+    <!-- Counter Tool -->
+    <section class="counter-container">
+        <div class="container">
+            <div class="counter-card">
+                <div class="input-section">
+                    <h3>Enter Your Text</h3>
+                    <textarea class="text-input" id="textInput" placeholder="Type or paste your text here..."></textarea>
+                    <div class="input-actions">
+                        <button class="paste-btn" id="pasteBtn">
+                            <i class="fas fa-paste"></i> Paste Text
+                        </button>
+                        <div>
+                            <span id="lastUpdated">Last updated: Just now</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <h3>Text Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="wordCount">0</div>
+                            <div class="stat-label">Words</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="charCount">0</div>
+                            <div class="stat-label">Characters</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="charNoSpacesCount">0</div>
+                            <div class="stat-label">Characters (no spaces)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="sentenceCount">0</div>
+                            <div class="stat-label">Sentences</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="details-section">
+                    <h4>Additional Details</h4>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <div class="detail-value" id="paragraphCount">0</div>
+                            <div class="detail-label">Paragraphs</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value" id="lineCount">0</div>
+                            <div class="detail-label">Lines</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value" id="spaceCount">0</div>
+                            <div class="detail-label">Spaces</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-value" id="avgWordLength">0.0</div>
+                            <div class="detail-label">Avg. Word Length</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="reading-stats">
+                    <h4>Reading Statistics</h4>
+                    <div class="reading-grid">
+                        <div class="reading-item">
+                            <div class="reading-value" id="readingTime">0</div>
+                            <div class="reading-label">Reading Time (minutes)</div>
+                        </div>
+                        <div class="reading-item">
+                            <div class="reading-value" id="speakingTime">0</div>
+                            <div class="reading-label">Speaking Time (minutes)</div>
+                        </div>
+                        <div class="reading-item">
+                            <div class="reading-value" id="longestWord">-</div>
+                            <div class="reading-label">Longest Word</div>
+                        </div>
+                        <div class="reading-item">
+                            <div class="reading-value" id="mostFrequent">-</div>
+                            <div class="reading-label">Most Frequent Word</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="copyBtn">Copy Results</button>
+                    <button class="btn btn-secondary" id="resetBtn">Clear Text</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const textInput = document.getElementById('textInput');
+            const pasteBtn = document.getElementById('pasteBtn');
+            const lastUpdated = document.getElementById('lastUpdated');
+            const wordCount = document.getElementById('wordCount');
+            const charCount = document.getElementById('charCount');
+            const charNoSpacesCount = document.getElementById('charNoSpacesCount');
+            const sentenceCount = document.getElementById('sentenceCount');
+            const paragraphCount = document.getElementById('paragraphCount');
+            const lineCount = document.getElementById('lineCount');
+            const spaceCount = document.getElementById('spaceCount');
+            const avgWordLength = document.getElementById('avgWordLength');
+            const readingTime = document.getElementById('readingTime');
+            const speakingTime = document.getElementById('speakingTime');
+            const longestWord = document.getElementById('longestWord');
+            const mostFrequent = document.getElementById('mostFrequent');
+            const copyBtn = document.getElementById('copyBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // Variables
+            let updateTimer;
+
+            // Event Listeners
+            textInput.addEventListener('input', handleTextChange);
+            pasteBtn.addEventListener('click', pasteText);
+            copyBtn.addEventListener('click', copyResults);
+            resetBtn.addEventListener('click', resetTool);
+
+            // Functions
+            function handleTextChange() {
+                // Clear previous timer
+                clearTimeout(updateTimer);
+                
+                // Set new timer to update stats after a short delay
+                updateTimer = setTimeout(updateStatistics, 300);
+                
+                // Update last updated time
+                updateLastUpdated();
+            }
+
+            function updateLastUpdated() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                lastUpdated.textContent = `Last updated: ${timeString}`;
+            }
+
+            function updateStatistics() {
+                const text = textInput.value;
+                
+                // Basic counts
+                const words = text.trim() ? text.trim().split(/\s+/) : [];
+                const characters = text.length;
+                const charactersNoSpaces = text.replace(/\s/g, '').length;
+                const spaces = (text.match(/\s/g) || []).length;
+                const sentences = text.trim() ? text.split(/[.!?]+/).filter(s => s.trim().length > 0).length : 0;
+                const paragraphs = text.trim() ? text.split(/\n+/).filter(p => p.trim().length > 0).length : 0;
+                const lines = text.split(/\r\n|\r|\n/).length;
+                
+                // Update basic stats
+                wordCount.textContent = words.length.toLocaleString();
+                charCount.textContent = characters.toLocaleString();
+                charNoSpacesCount.textContent = charactersNoSpaces.toLocaleString();
+                sentenceCount.textContent = sentences.toLocaleString();
+                paragraphCount.textContent = paragraphs.toLocaleString();
+                lineCount.textContent = lines.toLocaleString();
+                spaceCount.textContent = spaces.toLocaleString();
+                
+                // Calculate average word length
+                const totalWordLength = words.reduce((total, word) => total + word.length, 0);
+                const avgLength = words.length > 0 ? (totalWordLength / words.length).toFixed(1) : '0.0';
+                avgWordLength.textContent = avgLength;
+                
+                // Calculate reading and speaking times
+                const readingTimeMinutes = Math.ceil(words.length / 200); // Average reading speed: 200 words per minute
+                const speakingTimeMinutes = Math.ceil(words.length / 150); // Average speaking speed: 150 words per minute
+                readingTime.textContent = readingTimeMinutes;
+                speakingTime.textContent = speakingTimeMinutes;
+                
+                // Find longest word
+                if (words.length > 0) {
+                    const longest = words.reduce((a, b) => a.length > b.length ? a : b);
+                    longestWord.textContent = longest.length > 15 ? longest.substring(0, 15) + '...' : longest;
+                } else {
+                    longestWord.textContent = '-';
+                }
+                
+                // Find most frequent word (simplified)
+                if (words.length > 0) {
+                    const wordFreq = {};
+                    words.forEach(word => {
+                        const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+                        if (cleanWord && cleanWord.length > 2) {
+                            wordFreq[cleanWord] = (wordFreq[cleanWord] || 0) + 1;
+                        }
+                    });
+                    
+                    let mostFrequentWord = '-';
+                    let maxCount = 0;
+                    
+                    Object.keys(wordFreq).forEach(word => {
+                        if (wordFreq[word] > maxCount) {
+                            maxCount = wordFreq[word];
+                            mostFrequentWord = word;
+                        }
+                    });
+                    
+                    mostFrequent.textContent = mostFrequentWord.length > 12 ? 
+                        mostFrequentWord.substring(0, 12) + '...' : mostFrequentWord;
+                } else {
+                    mostFrequent.textContent = '-';
+                }
+            }
+
+            async function pasteText() {
+                try {
+                    const clipboardText = await navigator.clipboard.readText();
+                    textInput.value = clipboardText;
+                    updateStatistics();
+                    updateLastUpdated();
+                    
+                    // Scroll to top of text area
+                    textInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } catch (err) {
+                    alert('Unable to paste from clipboard. Please paste manually.');
+                    console.error('Failed to read clipboard contents: ', err);
+                }
+            }
+
+            function copyResults() {
+                const text = textInput.value;
+                if (!text.trim()) {
+                    alert('No text to copy. Please enter some text first.');
+                    return;
+                }
+
+                const results = `
+Word Count: ${wordCount.textContent}
+Character Count: ${charCount.textContent}
+Characters (no spaces): ${charNoSpacesCount.textContent}
+Sentences: ${sentenceCount.textContent}
+Paragraphs: ${paragraphCount.textContent}
+Lines: ${lineCount.textContent}
+Spaces: ${spaceCount.textContent}
+Average Word Length: ${avgWordLength.textContent}
+Reading Time: ${readingTime.textContent} minutes
+Speaking Time: ${speakingTime.textContent} minutes
+Longest Word: ${longestWord.textContent}
+Most Frequent Word: ${mostFrequent.textContent}
+                `.trim();
+
+                navigator.clipboard.writeText(results)
+                    .then(() => {
+                        // Visual feedback
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        alert('Failed to copy results to clipboard. Please try again.');
+                    });
+            }
+
+            function resetTool() {
+                textInput.value = '';
+                updateStatistics();
+                updateLastUpdated();
+                
+                // Scroll to top
+                textInput.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+
+            // Initialize with empty stats
+            updateStatistics();
+        });
+    </script>
+</body>
+</html>
