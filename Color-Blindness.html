@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Blindness Simulator | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .simulator-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .simulator-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--light-purple);
+            border-radius: var(--border-radius);
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-purple);
+            background-color: rgba(106, 13, 173, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .upload-area h3 {
+            margin-bottom: 10px;
+            color: var(--primary-purple);
+        }
+
+        .upload-area p {
+            color: var(--light-text);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .preview-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .simulation-options {
+            margin-bottom: 30px;
+        }
+
+        .simulation-options h3 {
+            margin-bottom: 15px;
+            color: var(--primary-purple);
+        }
+
+        .simulation-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .simulation-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            background-color: var(--light-purple);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--primary-purple);
+        }
+
+        .simulation-btn:hover {
+            background-color: #d8d8f0;
+            transform: translateY(-2px);
+        }
+
+        .simulation-btn.active {
+            background-color: var(--primary-purple);
+            color: var(--white);
+        }
+
+        .simulation-btn i {
+            font-size: 1.5rem;
+        }
+
+        .comparison-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .comparison-box {
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .comparison-box h3 {
+            background-color: var(--light-purple);
+            padding: 15px;
+            color: var(--primary-purple);
+            text-align: center;
+        }
+
+        .comparison-image {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+        }
+
+        .comparison-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .color-info {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .color-info h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .color-info p {
+            margin-bottom: 10px;
+        }
+
+        .color-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .color-type {
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+        }
+
+        .color-type h4 {
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+        }
+
+        .color-type p {
+            font-size: 0.9rem;
+            color: var(--light-text);
+        }
+
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .file-info p {
+            margin-bottom: 5px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .simulation-buttons {
+                flex-direction: column;
+            }
+
+            .comparison-section {
+                grid-template-columns: 1fr;
+            }
+
+            .color-types {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .simulator-card {
+                padding: 20px;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* Color blindness simulation filters */
+        .normal-vision { filter: none; }
+        .protanopia { filter: url('#protanopia'); }
+        .protanomaly { filter: url('#protanomaly'); }
+        .deuteranopia { filter: url('#deuteranopia'); }
+        .deuteranomaly { filter: url('#deuteranomaly'); }
+        .tritanopia { filter: url('#tritanopia'); }
+        .tritanomaly { filter: url('#tritanomaly'); }
+        .achromatopsia { filter: url('#achromatopsia'); }
+        .achromatomaly { filter: url('#achromatomaly'); }
+    </style>
+</head>
+<body>
+    <!-- Hidden SVG filters for color blindness simulation -->
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" style="display: none;">
+        <defs>
+            <!-- Protanopia (red-blind) -->
+            <filter id="protanopia">
+                <feColorMatrix type="matrix" values="0.567, 0.433, 0, 0, 0 0.558, 0.442, 0, 0, 0 0, 0.242, 0.758, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Protanomaly (red-weak) -->
+            <filter id="protanomaly">
+                <feColorMatrix type="matrix" values="0.817, 0.183, 0, 0, 0 0.333, 0.667, 0, 0, 0 0, 0.125, 0.875, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Deuteranopia (green-blind) -->
+            <filter id="deuteranopia">
+                <feColorMatrix type="matrix" values="0.625, 0.375, 0, 0, 0 0.7, 0.3, 0, 0, 0 0, 0.3, 0.7, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Deuteranomaly (green-weak) -->
+            <filter id="deuteranomaly">
+                <feColorMatrix type="matrix" values="0.8, 0.2, 0, 0, 0 0.258, 0.742, 0, 0, 0 0, 0.142, 0.858, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Tritanopia (blue-blind) -->
+            <filter id="tritanopia">
+                <feColorMatrix type="matrix" values="0.95, 0.05, 0, 0, 0 0, 0.433, 0.567, 0, 0 0, 0.475, 0.525, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Tritanomaly (blue-weak) -->
+            <filter id="tritanomaly">
+                <feColorMatrix type="matrix" values="0.967, 0.033, 0, 0, 0 0, 0.733, 0.267, 0, 0 0, 0.183, 0.817, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Achromatopsia (complete color blindness) -->
+            <filter id="achromatopsia">
+                <feColorMatrix type="matrix" values="0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0.299, 0.587, 0.114, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+            
+            <!-- Achromatomaly (partial color blindness) -->
+            <filter id="achromatomaly">
+                <feColorMatrix type="matrix" values="0.618, 0.320, 0.062, 0, 0 0.163, 0.775, 0.062, 0, 0 0.163, 0.320, 0.516, 0, 0 0, 0, 0, 1, 0"></feColorMatrix>
+            </filter>
+        </defs>
+    </svg>
+
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">Color Blindness Simulator</h1>
+            <p class="tool-subtitle">See how your images appear to people with different types of color vision</p>
+        </div>
+    </section>
+
+    <!-- Simulator Tool -->
+    <section class="simulator-container">
+        <div class="container">
+            <div class="simulator-card">
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Your Image</h3>
+                    <p>Drag & drop your image here or click to browse</p>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button class="btn btn-primary" id="browseBtn">Browse Files</button>
+                </div>
+
+                <div class="preview-section" id="previewSection">
+                    <div class="simulation-options">
+                        <h3>Color Vision Types</h3>
+                        <div class="simulation-buttons">
+                            <button class="simulation-btn active" data-type="normal">
+                                <i class="fas fa-eye"></i>
+                                Normal Vision
+                            </button>
+                            <button class="simulation-btn" data-type="protanopia">
+                                <i class="fas fa-eye-slash"></i>
+                                Protanopia
+                            </button>
+                            <button class="simulation-btn" data-type="deuteranopia">
+                                <i class="fas fa-eye-slash"></i>
+                                Deuteranopia
+                            </button>
+                            <button class="simulation-btn" data-type="tritanopia">
+                                <i class="fas fa-eye-slash"></i>
+                                Tritanopia
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="comparison-section">
+                        <div class="comparison-box">
+                            <h3>Original Image</h3>
+                            <div class="comparison-image">
+                                <img id="originalImage" src="" alt="Original Image">
+                            </div>
+                        </div>
+                        <div class="comparison-box">
+                            <h3 id="simulationTitle">Normal Vision</h3>
+                            <div class="comparison-image">
+                                <img id="simulatedImage" src="" alt="Simulated Image" class="normal-vision">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="file-info">
+                        <p><strong>File:</strong> <span id="originalFileName">-</span> | <span id="originalFileSize">-</span></p>
+                        <p><strong>Current Simulation:</strong> <span id="currentSimulation">Normal Vision</span></p>
+                    </div>
+
+                    <div class="color-info">
+                        <h3>About Color Blindness</h3>
+                        <p>Color blindness affects approximately 1 in 12 men and 1 in 200 women worldwide.</p>
+                        
+                        <div class="color-types">
+                            <div class="color-type">
+                                <h4>Protanopia</h4>
+                                <p>Red-blind, difficulty distinguishing between red and green hues.</p>
+                            </div>
+                            <div class="color-type">
+                                <h4>Deuteranopia</h4>
+                                <p>Green-blind, similar to protanopia but with different color confusion.</p>
+                            </div>
+                            <div class="color-type">
+                                <h4>Tritanopia</h4>
+                                <p>Blue-blind, difficulty distinguishing between blue and yellow hues.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="downloadBtn">Download Simulated Image</button>
+                        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const browseBtn = document.getElementById('browseBtn');
+            const previewSection = document.getElementById('previewSection');
+            const originalImage = document.getElementById('originalImage');
+            const simulatedImage = document.getElementById('simulatedImage');
+            const simulationTitle = document.getElementById('simulationTitle');
+            const originalFileName = document.getElementById('originalFileName');
+            const originalFileSize = document.getElementById('originalFileSize');
+            const currentSimulation = document.getElementById('currentSimulation');
+            const simulationButtons = document.querySelectorAll('.simulation-btn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
+
+            // Variables
+            let originalFile = null;
+            let currentType = 'normal';
+            const simulationTypes = {
+                'normal': { name: 'Normal Vision', class: 'normal-vision' },
+                'protanopia': { name: 'Protanopia (Red-Blind)', class: 'protanopia' },
+                'protanomaly': { name: 'Protanomaly (Red-Weak)', class: 'protanomaly' },
+                'deuteranopia': { name: 'Deuteranopia (Green-Blind)', class: 'deuteranopia' },
+                'deuteranomaly': { name: 'Deuteranomaly (Green-Weak)', class: 'deuteranomaly' },
+                'tritanopia': { name: 'Tritanopia (Blue-Blind)', class: 'tritanopia' },
+                'tritanomaly': { name: 'Tritanomaly (Blue-Weak)', class: 'tritanomaly' },
+                'achromatopsia': { name: 'Achromatopsia (Complete Color Blindness)', class: 'achromatopsia' },
+                'achromatomaly': { name: 'Achromatomaly (Partial Color Blindness)', class: 'achromatomaly' }
+            };
+
+            // Event Listeners
+            browseBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleFileDrop);
+            simulationButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    simulationButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentType = this.getAttribute('data-type');
+                    updateSimulation();
+                });
+            });
+            downloadBtn.addEventListener('click', downloadImage);
+            resetBtn.addEventListener('click', resetTool);
+
+            // Functions
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.borderColor = 'var(--primary-purple)';
+                uploadArea.style.backgroundColor = 'rgba(106, 13, 173, 0.05)';
+            }
+
+            function handleFileDrop(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                uploadArea.style.borderColor = 'var(--light-purple)';
+                uploadArea.style.backgroundColor = 'transparent';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    const file = e.dataTransfer.files[0];
+                    if (file.type.startsWith('image/')) {
+                        processFile(file);
+                    } else {
+                        alert('Please select a valid image file (JPG, PNG, etc.).');
+                    }
+                }
+            }
+
+            function handleFileSelect(e) {
+                if (e.target.files && e.target.files[0]) {
+                    processFile(e.target.files[0]);
+                }
+            }
+
+            function processFile(file) {
+                originalFile = file;
+                
+                // Display file info
+                originalFileName.textContent = file.name;
+                originalFileSize.textContent = formatFileSize(file.size);
+                
+                // Preview original image
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    simulatedImage.src = e.target.result;
+                    previewSection.style.display = 'block';
+                    
+                    // Scroll to preview section
+                    previewSection.scrollIntoView({ behavior: 'smooth' });
+                    
+                    // Update simulation
+                    updateSimulation();
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function updateSimulation() {
+                const simulation = simulationTypes[currentType];
+                
+                // Remove all filter classes
+                simulatedImage.className = '';
+                // Add the current filter class
+                simulatedImage.classList.add(simulation.class);
+                
+                // Update titles
+                simulationTitle.textContent = simulation.name;
+                currentSimulation.textContent = simulation.name;
+            }
+
+            function downloadImage() {
+                if (!originalFile) {
+                    alert('Please upload an image first.');
+                    return;
+                }
+
+                // Create a canvas to apply the filter and download
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    
+                    // Draw the image
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Apply the filter (this is a simplified approach)
+                    // In a real implementation, you would apply the color matrix filter
+                    // For this demo, we'll just download the original image
+                    
+                    // Convert to blob and download
+                    canvas.toBlob(function(blob) {
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = originalFile.name.split('.')[0] + '_' + currentType + '.' + originalFile.name.split('.').pop();
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                    }, originalFile.type);
+                };
+                
+                img.src = originalImage.src;
+            }
+
+            function resetTool() {
+                fileInput.value = '';
+                originalImage.src = '';
+                simulatedImage.src = '';
+                previewSection.style.display = 'none';
+                originalFileName.textContent = '-';
+                originalFileSize.textContent = '-';
+                originalFile = null;
+                
+                // Reset to normal vision
+                simulationButtons.forEach(btn => btn.classList.remove('active'));
+                document.querySelector('[data-type="normal"]').classList.add('active');
+                currentType = 'normal';
+                updateSimulation();
+            }
+
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
