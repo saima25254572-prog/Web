@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Minifier | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .minifier-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .minifier-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .code-comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .code-panel {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .code-panel h3 {
+            background-color: var(--light-purple);
+            padding: 15px;
+            color: var(--primary-purple);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-area {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+            background-color: #f9f9f9;
+        }
+
+        .code-area:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+        }
+
+        .char-count {
+            font-size: 0.8rem;
+            color: var(--light-text);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .minification-stats {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .minification-stats h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .stat-item {
+            background-color: var(--white);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .features-section {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .features-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-item i {
+            color: var(--primary-purple);
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .code-comparison {
+                flex-direction: column;
+            }
+
+            .code-panel {
+                min-width: 100%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .minifier-card {
+                padding: 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">HTML Minifier</h1>
+            <p class="tool-subtitle">Minify your HTML code by removing unnecessary spaces, line breaks, and comments</p>
+        </div>
+    </section>
+
+    <!-- Minifier Tool -->
+    <section class="minifier-container">
+        <div class="container">
+            <div class="minifier-card">
+                <div class="code-comparison">
+                    <div class="code-panel">
+                        <h3>
+                            Original HTML
+                            <span class="char-count" id="originalCharCount">0 characters</span>
+                        </h3>
+                        <textarea class="code-area" id="inputCode" placeholder="Paste your HTML code here..."></textarea>
+                    </div>
+                    <div class="code-panel">
+                        <h3>
+                            Minified HTML
+                            <span class="char-count" id="minifiedCharCount">0 characters</span>
+                        </h3>
+                        <textarea class="code-area" id="outputCode" placeholder="Minified HTML will appear here..." readonly></textarea>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="minifyBtn">
+                        <i class="fas fa-compress-arrows-alt"></i>
+                        Minify HTML
+                    </button>
+                    <button class="btn btn-secondary" id="copyBtn">
+                        <i class="fas fa-copy"></i>
+                        Copy Minified Code
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <i class="fas fa-eraser"></i>
+                        Clear All
+                    </button>
+                </div>
+
+                <div class="minification-stats">
+                    <h3>Minification Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" id="originalSize">0</div>
+                            <div class="stat-label">Original Size (bytes)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="minifiedSize">0</div>
+                            <div class="stat-label">Minified Size (bytes)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="savings">0</div>
+                            <div class="stat-label">Bytes Saved</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="reduction">0%</div>
+                            <div class="stat-label">Size Reduction</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="features-section">
+                    <h3>What Our Minifier Does:</h3>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Removes unnecessary whitespace</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Removes line breaks</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Removes HTML comments</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Preserves text content</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Maintains functionality</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Optimizes file size</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const inputCode = document.getElementById('inputCode');
+            const outputCode = document.getElementById('outputCode');
+            const originalCharCount = document.getElementById('originalCharCount');
+            const minifiedCharCount = document.getElementById('minifiedCharCount');
+            const minifyBtn = document.getElementById('minifyBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const originalSize = document.getElementById('originalSize');
+            const minifiedSize = document.getElementById('minifiedSize');
+            const savings = document.getElementById('savings');
+            const reduction = document.getElementById('reduction');
+
+            // Event Listeners
+            inputCode.addEventListener('input', updateCharCount);
+            minifyBtn.addEventListener('click', minifyHTML);
+            copyBtn.addEventListener('click', copyToClipboard);
+            clearBtn.addEventListener('click', clearAll);
+
+            // Functions
+            function updateCharCount() {
+                const text = inputCode.value;
+                originalCharCount.textContent = `${text.length} characters`;
+            }
+
+            function minifyHTML() {
+                const html = inputCode.value.trim();
+                
+                if (!html) {
+                    alert('Please enter some HTML code to minify.');
+                    return;
+                }
+
+                try {
+                    // Perform minification
+                    let minified = html;
+                    
+                    // Remove HTML comments (but not conditional comments)
+                    minified = minified.replace(/<!--(?!\[if\s|\s<!\[endif\]-->\s*$)[\s\S]*?-->/g, '');
+                    
+                    // Remove whitespace between tags
+                    minified = minified.replace(/>\s+</g, '><');
+                    
+                    // Remove multiple whitespace characters with a single space
+                    minified = minified.replace(/\s+/g, ' ');
+                    
+                    // Trim the result
+                    minified = minified.trim();
+                    
+                    // Update output
+                    outputCode.value = minified;
+                    
+                    // Update character counts
+                    minifiedCharCount.textContent = `${minified.length} characters`;
+                    
+                    // Update statistics
+                    updateStatistics(html, minified);
+                } catch (error) {
+                    console.error('Minification error:', error);
+                    outputCode.value = 'Error: Could not minify the HTML. Please check your code.';
+                }
+            }
+
+            function updateStatistics(original, minified) {
+                const originalBytes = new Blob([original]).size;
+                const minifiedBytes = new Blob([minified]).size;
+                const bytesSaved = originalBytes - minifiedBytes;
+                const reductionPercent = ((bytesSaved / originalBytes) * 100).toFixed(1);
+                
+                originalSize.textContent = originalBytes;
+                minifiedSize.textContent = minifiedBytes;
+                savings.textContent = bytesSaved;
+                reduction.textContent = `${reductionPercent}%`;
+            }
+
+            function copyToClipboard() {
+                if (!outputCode.value) {
+                    alert('No minified code to copy. Please minify some HTML first.');
+                    return;
+                }
+
+                outputCode.select();
+                outputCode.setSelectionRange(0, 99999); // For mobile devices
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        // Visual feedback
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    } else {
+                        alert('Failed to copy code. Please try again.');
+                    }
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    // Fallback: Use clipboard API if available
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(outputCode.value)
+                            .then(() => {
+                                const originalText = copyBtn.innerHTML;
+                                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                                setTimeout(() => {
+                                    copyBtn.innerHTML = originalText;
+                                }, 2000);
+                            })
+                            .catch(err => {
+                                console.error('Clipboard API error:', err);
+                                alert('Failed to copy code. Please try again.');
+                            });
+                    } else {
+                        alert('Failed to copy code. Please try again.');
+                    }
+                }
+            }
+
+            function clearAll() {
+                inputCode.value = '';
+                outputCode.value = '';
+                originalCharCount.textContent = '0 characters';
+                minifiedCharCount.textContent = '0 characters';
+                originalSize.textContent = '0';
+                minifiedSize.textContent = '0';
+                savings.textContent = '0';
+                reduction.textContent = '0%';
+            }
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
