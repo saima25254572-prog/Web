@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Encoder/Decoder | Multitooler</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --accent-red: #FF3366;
+            --light-purple: #E6E6FA;
+            --dark-text: #333333;
+            --light-text: #666666;
+            --white: #FFFFFF;
+            --light-bg: #F9F9F9;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --card-shadow-hover: 0 8px 20px rgba(0, 0, 0, 0.12);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--white);
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-purple);
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-purple);
+        }
+
+        .nav-link:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary-purple);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-purple);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .tool-title {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .encoder-container {
+            padding: 60px 0;
+            background-color: var(--light-bg);
+        }
+
+        .encoder-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .text-input-section, .text-output-section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h3 {
+            color: var(--primary-purple);
+        }
+
+        .char-count {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 150px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: var(--transition);
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.2);
+        }
+
+        .output-area {
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-red);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: #e62e5c;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-purple);
+            color: var(--primary-purple);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8d8f0;
+        }
+
+        .btn-copy {
+            background-color: var(--primary-purple);
+            color: var(--white);
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+
+        .btn-copy:hover {
+            background-color: var(--secondary-purple);
+        }
+
+        .examples-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .examples-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .example-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .example-card h4 {
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .example-card p {
+            font-size: 0.9rem;
+            color: var(--light-text);
+            margin-bottom: 10px;
+        }
+
+        .example-text {
+            font-family: monospace;
+            background-color: #f5f5f5;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            overflow-x: auto;
+        }
+
+        .info-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: var(--light-purple);
+            border-radius: var(--border-radius);
+        }
+
+        .info-section h3 {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .info-section p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        footer {
+            background-color: #2C2C2C;
+            color: var(--white);
+            padding: 40px 0 20px;
+        }
+
+        .footer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+
+        .footer-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .footer-tagline {
+            color: #CCCCCC;
+            max-width: 300px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-link {
+            color: #CCCCCC;
+            transition: var(--transition);
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        .footer-bottom {
+            margin-top: 40px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444444;
+            color: #999999;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .tool-title {
+                font-size: 2rem;
+            }
+
+            .tool-subtitle {
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .tool-title {
+                font-size: 1.8rem;
+            }
+
+            .encoder-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-container">
+            <a href="#" class="logo">Multitooler</a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#" class="nav-link">Home</a></li>
+                    <li><a href="#" class="nav-link">Tools</a></li>
+                    <li><a href="#" class="nav-link">About Us</a></li>
+                    <li><a href="#" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+            
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Tool Header -->
+    <section class="tool-header">
+        <div class="container">
+            <h1 class="tool-title">URL Encoder/Decoder</h1>
+            <p class="tool-subtitle">Encode text to URL-safe format or decode URL-encoded strings back to readable text</p>
+        </div>
+    </section>
+
+    <!-- Encoder Tool -->
+    <section class="encoder-container">
+        <div class="container">
+            <div class="encoder-card">
+                <div class="text-input-section">
+                    <div class="section-header">
+                        <h3>Input Text</h3>
+                        <div class="char-count">Characters: <span id="inputCharCount">0</span></div>
+                    </div>
+                    <textarea class="text-area" id="inputText" placeholder="Enter text to encode or a URL-encoded string to decode..."></textarea>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="encodeBtn">
+                        <i class="fas fa-lock"></i> Encode URL
+                    </button>
+                    <button class="btn btn-primary" id="decodeBtn">
+                        <i class="fas fa-unlock"></i> Decode URL
+                    </button>
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <i class="fas fa-broom"></i> Clear All
+                    </button>
+                </div>
+
+                <div class="text-output-section">
+                    <div class="section-header">
+                        <h3>Output Text</h3>
+                        <div class="char-count">Characters: <span id="outputCharCount">0</span></div>
+                    </div>
+                    <textarea class="text-area output-area" id="outputText" placeholder="Encoded or decoded text will appear here..." readonly></textarea>
+                    <button class="btn btn-copy" id="copyBtn" disabled>
+                        <i class="fas fa-copy"></i> Copy Output
+                    </button>
+                </div>
+
+                <div class="examples-section">
+                    <h3>Examples</h3>
+                    <div class="examples-grid">
+                        <div class="example-card">
+                            <h4><i class="fas fa-arrow-right"></i> Encoding Example</h4>
+                            <p>Original:</p>
+                            <div class="example-text">Hello World & Welcome!</div>
+                            <p>Encoded:</p>
+                            <div class="example-text">Hello%20World%20%26%20Welcome%21</div>
+                        </div>
+                        <div class="example-card">
+                            <h4><i class="fas fa-arrow-left"></i> Decoding Example</h4>
+                            <p>Encoded:</p>
+                            <div class="example-text">https%3A%2F%2Fexample.com%2Fpage%3Fid%3D123</div>
+                            <p>Decoded:</p>
+                            <div class="example-text">https://example.com/page?id=123</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About URL Encoding/Decoding</h3>
+                    <p>URL encoding converts characters into a format that can be transmitted over the Internet. URLs can only be sent over the Internet using the ASCII character set.</p>
+                    <p>Since URLs often contain characters outside the ASCII set, they must be converted to a valid ASCII format. URL encoding replaces unsafe ASCII characters with a "%" followed by two hexadecimal digits.</p>
+                    <p>Common characters that need encoding include spaces (replaced with %20), ampersands (& replaced with %26), and question marks (? replaced with %3F).</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-container">
+                <div class="footer-brand">
+                    <div class="footer-logo">Multitooler</div>
+                    <p class="footer-tagline">Simplifying your digital life.</p>
+                </div>
+                
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Privacy Policy</a>
+                    <a href="#" class="footer-link">Terms of Use</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 Multitooler. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const inputText = document.getElementById('inputText');
+            const outputText = document.getElementById('outputText');
+            const inputCharCount = document.getElementById('inputCharCount');
+            const outputCharCount = document.getElementById('outputCharCount');
+            const encodeBtn = document.getElementById('encodeBtn');
+            const decodeBtn = document.getElementById('decodeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            const copyBtn = document.getElementById('copyBtn');
+
+            // Event Listeners
+            inputText.addEventListener('input', updateInputStats);
+            encodeBtn.addEventListener('click', encodeText);
+            decodeBtn.addEventListener('click', decodeText);
+            clearBtn.addEventListener('click', clearAll);
+            copyBtn.addEventListener('click', copyOutput);
+
+            // Functions
+            function updateInputStats() {
+                const text = inputText.value;
+                const charCount = text.length;
+                inputCharCount.textContent = charCount;
+            }
+
+            function updateOutputStats(text) {
+                const charCount = text.length;
+                outputCharCount.textContent = charCount;
+                copyBtn.disabled = text === '';
+            }
+
+            function encodeText() {
+                const text = inputText.value.trim();
+                if (text === '') {
+                    alert('Please enter some text to encode.');
+                    return;
+                }
+                
+                try {
+                    // Use encodeURIComponent for full URL encoding
+                    const encodedText = encodeURIComponent(text);
+                    outputText.value = encodedText;
+                    updateOutputStats(encodedText);
+                } catch (error) {
+                    alert('Error encoding text: ' + error.message);
+                }
+            }
+
+            function decodeText() {
+                const text = inputText.value.trim();
+                if (text === '') {
+                    alert('Please enter a URL-encoded string to decode.');
+                    return;
+                }
+                
+                try {
+                    // Use decodeURIComponent for URL decoding
+                    const decodedText = decodeURIComponent(text);
+                    outputText.value = decodedText;
+                    updateOutputStats(decodedText);
+                } catch (error) {
+                    alert('Error decoding text. Please make sure you have entered a valid URL-encoded string.');
+                }
+            }
+
+            function clearAll() {
+                inputText.value = '';
+                outputText.value = '';
+                inputCharCount.textContent = '0';
+                outputCharCount.textContent = '0';
+                copyBtn.disabled = true;
+            }
+
+            function copyOutput() {
+                if (outputText.value.trim() === '') {
+                    alert('No text to copy.');
+                    return;
+                }
+                
+                outputText.select();
+                outputText.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        // Visual feedback
+                        const originalText = copyBtn.innerHTML;
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalText;
+                        }, 2000);
+                    } else {
+                        alert('Failed to copy text. Please try again.');
+                    }
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    // Fallback: Use clipboard API if available
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(outputText.value)
+                            .then(() => {
+                                const originalText = copyBtn.innerHTML;
+                                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                                setTimeout(() => {
+                                    copyBtn.innerHTML = originalText;
+                                }, 2000);
+                            })
+                            .catch(err => {
+                                console.error('Clipboard API error:', err);
+                                alert('Failed to copy text. Please try again.');
+                            });
+                    } else {
+                        alert('Failed to copy text. Please try again.');
+                    }
+                }
+            }
+
+            // Initialize
+            updateInputStats();
+            updateOutputStats('');
+
+            // Mobile menu toggle
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            const navMenu = document.querySelector('.nav-menu');
+            
+            mobileMenuBtn.addEventListener('click', function() {
+                const isVisible = navMenu.style.display === 'flex';
+                
+                if (isVisible) {
+                    navMenu.style.display = 'none';
+                } else {
+                    navMenu.style.display = 'flex';
+                    navMenu.style.flexDirection = 'column';
+                    navMenu.style.position = 'absolute';
+                    navMenu.style.top = '70px';
+                    navMenu.style.right = '20px';
+                    navMenu.style.background = 'white';
+                    navMenu.style.padding = '20px';
+                    navMenu.style.borderRadius = '10px';
+                    navMenu.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+                    navMenu.style.gap = '15px';
+                }
+            });
+
+            // Add some sample text for demonstration
+            inputText.value = "Hello World! How are you?";
+            updateInputStats();
+        });
+    </script>
+</body>
+</html>
